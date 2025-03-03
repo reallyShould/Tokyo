@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user
-from models import db, User
+from models import Users
 
+users = Users()
 auth_routes = Blueprint('auth_routes', __name__)
+
 
 @auth_routes.route('/register', methods=['GET', 'POST'])
 def register():
@@ -10,16 +12,12 @@ def register():
         username = request.form['username']
         password = request.form['password']
         
-        if User.query.filter_by(username=username).first():
-            flash('Пользователь с таким именем уже существует!', 'danger')
-            return redirect(url_for('auth_routes.register'))
-        
-        new_user = User(username=username, password=password)
-        db.session.add(new_user)
-        db.session.commit()
-        
-        flash('Регистрация успешна! Вы можете войти в свой аккаунт.', 'success')
-        return redirect(url_for('auth_routes.login'))
+        if users.checkUser(username):
+            users.register_user(username, password)
+            return redirect(url_for('auth_routes.login'))
+        else:
+            print("EXISTS")
+            # ADD BANNER
     
     return render_template('register.html')
 
