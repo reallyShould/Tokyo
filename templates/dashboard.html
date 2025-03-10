@@ -1,15 +1,33 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1>Добро пожаловать, {{ username }}!</h1>
-        <a href="{{ url_for('auth_routes.logout') }}">Выход</a>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Добро пожаловать, {{ username }}!</h1>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Обращения</h5>
+                    <p class="card-text display-4">{{ requests_count }}</p>
+                    <p class="card-text">Активных заявок на обслуживание</p>
+                    <a href="{{ url_for('requests.list_requests') }}" class="btn btn-light">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        
+        {% if is_admin %}
+        <div class="col-md-6 mb-4">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Инциденты</h5>
+                    <p class="card-text display-4">{{ incidents_count }}</p>
+                    <p class="card-text">Нерешённых инцидентов</p>
+                    <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-light">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
