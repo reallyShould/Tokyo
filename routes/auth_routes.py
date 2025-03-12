@@ -59,7 +59,7 @@ def dashboard():
     requests_count = cursor.fetchone()[0]
     
     incidents_count = 0
-    if current_user.is_admin():  # Показываем инциденты только админам
+    if current_user.is_system_adm(): 
         cursor.execute("SELECT COUNT(*) FROM incidents WHERE status != 'resolved'")
         incidents_count = cursor.fetchone()[0]
     
@@ -69,7 +69,7 @@ def dashboard():
                          requests_count=requests_count,
                          incidents_count=incidents_count,
                          username=current_user.username,
-                         is_admin=current_user.is_admin())
+                         is_admin=current_user.is_system_adm())
 
 @auth_routes.route('/logout')
 @login_required

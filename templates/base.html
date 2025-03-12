@@ -7,7 +7,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('auth_routes.dashboard') }}">Платформа заявок</a>
+            <a class="navbar-brand" href="{{ url_for('auth_routes.dashboard') }}">Alcohol</a>
             <div class="navbar-nav">
                 <a class="nav-link" href="{{ url_for('auth_routes.logout') }}">Выйти</a>
             </div>
@@ -17,7 +17,10 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }} mt-2 mx-2">{{ message }}</div>
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             {% endfor %}
         {% endif %}
     {% endwith %}

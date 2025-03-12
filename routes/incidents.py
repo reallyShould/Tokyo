@@ -8,12 +8,12 @@ incidents_bp = Blueprint('incidents', __name__)
 @incidents_bp.route('/incidents')
 @login_required
 def list_incidents():
-    if not current_user.is_admin():
+    if not current_user.is_system_adm():
         abort(403)
     
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, status, created_at FROM incidents WHERE status != 'resolved'")
+    cursor.execute("SELECT id, title, status, created_at FROM requests WHERE status != 'resolved'")
     incidents = cursor.fetchall()
     conn.close()
     return render_template('incidents.html', incidents=incidents)

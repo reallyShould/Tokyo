@@ -13,8 +13,8 @@ class User(UserMixin):
     def get_id(self):
         return str(self.id)
 
-    def is_admin(self):
-        return self.role == 'admin'
+    def is_system_adm(self):
+        return self.role == 'system-adm' or self.role == 'admin'
 
 class Users:
     def init_db(self):
@@ -26,7 +26,7 @@ class Users:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
                 password_hash BLOB NOT NULL,
-                role TEXT NOT NULL DEFAULT 'user'  -- Новое поле для роли
+                role TEXT NOT NULL DEFAULT 'user'
             )
         """)
         
@@ -42,17 +42,6 @@ class Users:
             )
         """)
         
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS incidents (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER,
-                title TEXT NOT NULL,
-                description TEXT,
-                status TEXT DEFAULT 'open',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id)
-            )
-        """)
         
         conn.commit()
         conn.close()
