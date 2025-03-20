@@ -55,12 +55,12 @@ def dashboard():
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     cursor = conn.cursor()
     
-    cursor.execute("SELECT COUNT(*) FROM requests WHERE status != 'closed'")
+    cursor.execute("SELECT COUNT(*) FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
     requests_count = cursor.fetchone()[0]
     
     incidents_count = 0
-    if current_user.is_system_adm(): 
-        cursor.execute("SELECT COUNT(*) FROM incidents WHERE status != 'resolved'")
+    if current_user.is_specialist():
+        cursor.execute("SELECT COUNT(*) FROM requests WHERE status == 'open'")
         incidents_count = cursor.fetchone()[0]
     
     conn.close()
@@ -69,7 +69,7 @@ def dashboard():
                          requests_count=requests_count,
                          incidents_count=incidents_count,
                          username=current_user.username,
-                         is_admin=current_user.is_system_adm())
+                         is_specialist=current_user.is_specialist())
 
 @auth_routes.route('/logout')
 @login_required

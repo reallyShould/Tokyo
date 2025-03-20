@@ -13,7 +13,7 @@ class User(UserMixin):
     def get_id(self):
         return str(self.id)
 
-    def is_system_adm(self):
+    def is_specialist(self):
         return self.role == 'system-adm' or self.role == 'admin'
 
 class Users:
@@ -37,11 +37,11 @@ class Users:
                 title TEXT NOT NULL,
                 description TEXT,
                 status TEXT DEFAULT 'open',
+                resolution TEXT,  -- Поле для описания решения
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
         """)
-        
         
         conn.commit()
         conn.close()

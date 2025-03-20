@@ -10,18 +10,25 @@
                 <th>Название</th>
                 <th>Статус</th>
                 <th>Дата создания</th>
+                <th>Заявитель</th>
             </tr>
         </thead>
         <tbody>
             {% for incident in incidents %}
             <tr>
                 <td>{{ incident[0] }}</td>
-                <td>{{ incident[1] }}</td>
-                <td>{{ incident[2] }}</td>
+                <td>
+                    <a href="{{ url_for('incidents.view_incident', incident_id=incident[0]) }}">
+                        {{ incident[1] }}
+                    </a>
+                </td>
+                <td>{{ status }}</td>
                 <td>{{ incident[3] }}</td>
+                <td>{{ user }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary">На главную</a>
 </div>
 {% endblock %}

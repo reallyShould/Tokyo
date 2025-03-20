@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Детали инцидента #{{ incident[0] }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ incident[1] }}</h5>
+            <p class="card-text"><strong>Описание:</strong> {{ incident[2] if incident[2] else "Описание отсутствует" }}</p>
+            <p class="card-text"><strong>Статус:</strong> {{ status }}</p>
+            <p class="card-text"><strong>Дата создания:</strong> {{ incident[4] }}</p>
+            <p class="card-text"><strong>Создал:</strong> {{ creator_username }}</p>
+            {% if incident[6] %}
+            <p class="card-text"><strong>Решение:</strong> {{ incident[6] }}</p>
+            {% endif %}
+            {% if incident[3] != 'resolved' %}
+            <a href="{{ url_for('incidents.resolve_incident', incident_id=incident[0]) }}" class="btn btn-success">Решить</a>
+            {% endif %}
+            <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-secondary">Назад к списку</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

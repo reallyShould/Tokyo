@@ -20,6 +20,10 @@ def load_user(user_id):
 def forbidden(e):
     return render_template('403.html'), 403
 
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html'), 404
+
 users = Users()
 users.init_db()
 

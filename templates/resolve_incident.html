@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Решение инцидента #{{ incident_id }}</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="resolution" class="form-label">Описание решения</label>
+            <textarea class="form-control" id="resolution" name="resolution" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Решить</button>
+        <a href="{{ url_for('incidents.view_incident', incident_id=incident_id) }}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

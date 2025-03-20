@@ -10,7 +10,7 @@ requests_bp = Blueprint('requests', __name__)
 def list_requests():
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, status, created_at FROM requests WHERE status != 'closed'")
+    cursor.execute("SELECT id, title, status, created_at FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
     requests = cursor.fetchall()
     conn.close()
     return render_template('requests.html', requests=requests)
@@ -41,3 +41,29 @@ def create_request():
             return render_template('create_request.html')
     
     return render_template('create_request.html')
+
+@requests_bp.route('/close_request/<int:request_id>', methods=['POST'])
+@login_required
+def close_request(request_id):
+    conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+    cursor = conn.cursor()
+    
+    # Проверяем, что запрос принадлежит текущему пользователю
+    cursor.execute("SELECT user_id FROM requests WHERE id = ?", (request_id,))
+    request = cursor.fetchone()
+    
+    if not request or request[0] != current_user.id:
+        conn.close()
+        flash('У вас нет прав для закрытия этой заявки.', 'error')
+        return redirect(url_for('requests.list_requests'))
+    
+    try:
+        cursor.execute("UPDATE requests SET status = 'closed' WHERE id = ?", (request_id,))
+        conn.commit()
+        flash('Заявка успешно закрыта.', 'success')
+    except Exception as e:
+        flash('Ошибка при закрытии заявки.', 'error')
+        print(f"Close request error: {e}")
+    
+    conn.close()
+    return redirect(url_for('requests.list_requests'))
