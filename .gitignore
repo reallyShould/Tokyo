@@ -1,4 +1,3 @@
 __pycache__
-venv
-instance/users.db
 .venv
+instance/data.db
