@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Не найдено (404)</h1>
+    <p>Данной страницы не существует.</p>
+    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-primary">Вернуться на главную</a>
+</div>
+{% endblock %}
