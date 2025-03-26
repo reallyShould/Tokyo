@@ -4,7 +4,7 @@ from models import Users
 from routes import auth_routes, requests, incidents
 from config import Config
 
-app = Flask(__name__)
+app = Flask(__name__, )
 app.config.from_object(Config)
 
 login_manager = LoginManager()
@@ -32,4 +32,4 @@ app.register_blueprint(requests.requests_bp)
 app.register_blueprint(incidents.incidents_bp)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
