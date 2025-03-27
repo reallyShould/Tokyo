@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Справочник</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Логин</th>
+                <th>ФИО</th>
+                <th>Почта</th>
+                <th>Должность</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{user[0]}}</td>
+                <td>
+                    {% if is_specialist %}
+                    <a href="{{ url_for('users.view_user', user_id=user[0]) }}">
+                        {{ user[1] }}
+                    </a>
+                    {% endif %}
+                    {% if not is_specialist %}
+                    {{ user[1] }}
+                    {% endif %}
+                </td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[3] }}</td>
+                <td>{{ user[4] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary">На главную</a>
+</div>
+{% endblock %}

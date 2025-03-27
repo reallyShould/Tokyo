@@ -22,9 +22,9 @@
                         {{ incident[1] }}
                     </a>
                 </td>
-                <td>{{ status }}</td>
+                <td>{{ change_names(incident[2]) }}</td>
                 <td>{{ incident[3] }}</td>
-                <td>{{ user }}</td>
+                <td>{{ get_username(None, incident[4]) }}</td>
             </tr>
             {% endfor %}
         </tbody>

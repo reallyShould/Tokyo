@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 import sqlite3
 import config
 from format_table import change_names
+from models import Users
 
 incidents_bp = Blueprint('incidents', __name__)
 
@@ -14,16 +15,11 @@ def list_incidents():
     
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, status, created_at FROM requests WHERE status != 'resolved'")
+    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE status != 'resolved' and status != 'closed'")
     incidents = cursor.fetchall()
-    cursor.execute("SELECT username FROM users WHERE id = ?", (incidents[0][0],))
-    user = cursor.fetchone()[0]
-    cursor.execute("SELECT status FROM requests WHERE id = ?", (incidents[0][0],))
-    status = change_names(cursor.fetchone()[0])
-
     conn.close()
     
-    return render_template('incidents.html', incidents=incidents, user=user, status=status)
+    return render_template('incidents.html', incidents=incidents, get_username=Users.get_username_by_id)
 
 @incidents_bp.route('/incidents/<int:incident_id>')
 @login_required

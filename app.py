@@ -1,11 +1,15 @@
 from flask import Flask, render_template
 from flask_login import LoginManager
 from models import Users
-from routes import auth_routes, requests, incidents
+from routes import auth_routes, requests, incidents, users_list
 from config import Config
+import format_table
 
 app = Flask(__name__, )
 app.config.from_object(Config)
+
+app.jinja_env.globals['get_username'] = Users.get_username_by_id
+app.jinja_env.globals['change_names'] = format_table.change_names
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -30,6 +34,7 @@ users.init_db()
 app.register_blueprint(auth_routes)
 app.register_blueprint(requests.requests_bp)
 app.register_blueprint(incidents.incidents_bp)
+app.register_blueprint(users_list.users_bp)
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0")
+    app.run(debug=True, host=Config.HOST, port=Config.PORT)

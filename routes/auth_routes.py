@@ -7,6 +7,14 @@ import config
 users = Users()
 auth_routes = Blueprint('auth_routes', __name__)
 
+@auth_routes.route("/", methods=['GET', 'POST'])
+def main_page():
+    if current_user.is_authenticated:
+        return redirect(url_for('auth_routes.dashboard'))
+    else:
+        return redirect(url_for('auth_routes.login'))
+
+
 @auth_routes.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -57,18 +65,25 @@ def dashboard():
     
     cursor.execute("SELECT COUNT(*) FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
     requests_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM users")
+    users_count = cursor.fetchone()[0]
     
     incidents_count = 0
     if current_user.is_specialist():
         cursor.execute("SELECT COUNT(*) FROM requests WHERE status == 'open'")
         incidents_count = cursor.fetchone()[0]
     
+    cursor.execute("SELECT fullname FROM users WHERE username = ?", (current_user.username,))
+    fullname = cursor.fetchall()[0][0]
     conn.close()
     
     return render_template('dashboard.html', 
+                         users_count=users_count,
                          requests_count=requests_count,
                          incidents_count=incidents_count,
                          username=current_user.username,
+                         fullname=fullname,
                          is_specialist=current_user.is_specialist())
 
 @auth_routes.route('/logout')
