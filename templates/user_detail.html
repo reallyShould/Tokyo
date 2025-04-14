@@ -26,15 +26,19 @@
                     </div>
                 </div>
                 <div class="row mb-3">
-                    <div class="col-3"><strong>Должность:</strong></div>
+                    <div class="col-3"><strong>Роль:</strong></div>
                     <div class="col-9">
-                        <input type="text" class="form-control" name="spec" value="{{ spec if spec else '' }}" placeholder="Должность не указана">
+                        <select class="form-select" id="role" name="role">
+                            <option value="admin" {{ 'selected' if role == 'admin' else '' }}>Администратор</option>
+                            <option value="system-adm" {{ 'selected' if role == 'system-adm' else '' }}>Системный администратор</option>
+                            <option value="user" {{ 'selected' if role == 'user' else '' }}>Пользователь</option>
+                        </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Сохранить</button>
-                        <a href="{{ url_for('users.list_users') }}" class="btn btn-secondary">Назад к списку</a>
+                        <a href="javascript:history.back()" class="btn btn-secondary me-2">Назад</a>
                     </div>
                 </div>
             </form>

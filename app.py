@@ -10,6 +10,10 @@ app.config.from_object(Config)
 
 app.jinja_env.globals['get_username'] = Users.get_username_by_id
 app.jinja_env.globals['change_names'] = format_table.change_names
+app.jinja_env.globals['change_spec'] = format_table.change_spec
+app.jinja_env.globals['view_incident'] = incidents.view_incident
+app.jinja_env.globals['get_fullname'] = Users.get_fullname_by_id
+app.jinja_env.globals['check_none'] = format_table.check_none
 
 login_manager = LoginManager()
 login_manager.init_app(app)

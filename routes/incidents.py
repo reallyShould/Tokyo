@@ -24,9 +24,6 @@ def list_incidents():
 @incidents_bp.route('/incidents/<int:incident_id>')
 @login_required
 def view_incident(incident_id):
-    if not current_user.is_specialist():
-        abort(403)
-    
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     cursor = conn.cursor()
     cursor.execute("SELECT id, title, description, status, created_at, user_id, resolution FROM requests WHERE id = ?", (incident_id,))
@@ -36,9 +33,9 @@ def view_incident(incident_id):
         conn.close()
         abort(404)
     
-    cursor.execute("SELECT username FROM users WHERE id = ?", (incident[5],))
+    cursor.execute("SELECT username, fullname FROM users WHERE id = ?", (incident[5],))
     user = cursor.fetchone()
-    creator_username = user[0] if user else "Неизвестный пользователь"
+    creator_username = f"{user[1] if user[1] != None else user[0]} " if user else "Неизвестный пользователь"
     cursor.execute("SELECT status FROM requests WHERE id = ?", (incident[0],))
     status = change_names(cursor.fetchone()[0])
     
@@ -47,7 +44,8 @@ def view_incident(incident_id):
     return render_template('incident_detail.html', 
                          incident=incident,
                          creator_username=creator_username,
-                         status=status)
+                         status=status,
+                         is_specialist=current_user.is_specialist)
 
 @incidents_bp.route('/resolve_incident/<int:incident_id>', methods=['GET', 'POST'])
 @login_required

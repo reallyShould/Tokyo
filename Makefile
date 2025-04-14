@@ -1,5 +1,5 @@
 all:
-	python app.py
+	python3 app.py
 clean:
 	rm -rf instance/data.db
-	python app.py
+	python3 app.py

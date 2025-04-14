@@ -2,21 +2,38 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Детали инцидента #{{ incident[0] }}</h1>
+    <h1 class="mb-4">Детали инцидента #{{ incident[0] }}</h1>
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">{{ incident[1] }}</h5>
-            <p class="card-text"><strong>Описание:</strong> {{ incident[2] if incident[2] else "Описание отсутствует" }}</p>
-            <p class="card-text"><strong>Статус:</strong> {{ status }}</p>
-            <p class="card-text"><strong>Дата создания:</strong> {{ incident[4] }}</p>
-            <p class="card-text"><strong>Создал:</strong> {{ creator_username }}</p>
+            <h5 class="card-title mb-3">{{ incident[1] }}</h5>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Описание:</div>
+                <div class="col-md-9">{{ incident[2] if incident[2] else "Описание отсутствует" }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Статус:</div>
+                <div class="col-md-9">{{ status }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Дата создания:</div>
+                <div class="col-md-9">{{ incident[4] }}</div>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Создал:</div>
+                <div class="col-md-9">{{ creator_username }}</div>
+            </div>
             {% if incident[6] %}
-            <p class="card-text"><strong>Решение:</strong> {{ incident[6] }}</p>
+            <div class="row mb-2">
+                <div class="col-md-3 fw-bold">Решение:</div>
+                <div class="col-md-9">{{ incident[6] }}</div>
+            </div>
             {% endif %}
-            {% if incident[3] != 'resolved' %}
-            <a href="{{ url_for('incidents.resolve_incident', incident_id=incident[0]) }}" class="btn btn-success">Решить</a>
-            {% endif %}
-            <a href="{{ url_for('incidents.list_incidents') }}" class="btn btn-secondary">Назад к списку</a>
+            <div class="mt-4">
+                {% if incident[3] != 'resolved' and is_specialist() %}
+                <a href="{{ url_for('incidents.resolve_incident', incident_id=incident[0]) }}" class="btn btn-success me-2">Решить</a>
+                {% endif %}
+                <a href="javascript:history.back()" class="btn btn-secondary me-2">Назад</a>
+            </div>
         </div>
     </div>
 </div>

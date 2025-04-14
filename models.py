@@ -27,7 +27,6 @@ class Users:
                 username TEXT UNIQUE NOT NULL,
                 fullname TEXT,
                 mail TEXT,
-                spec TEXT,
                 password_hash BLOB NOT NULL,
                 role TEXT NOT NULL DEFAULT 'user'
             )
@@ -131,3 +130,13 @@ class Users:
         if result:
             return result[0]
         return "Неизвестный пользователь"
+
+    def get_fullname_by_id(self, user_id):
+        conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+        cursor = conn.cursor()
+        cursor.execute("SELECT fullname FROM users WHERE id = ?", (user_id,))
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            return result[0]
+        return "Имя не указано"

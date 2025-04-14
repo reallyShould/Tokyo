@@ -10,13 +10,13 @@
                 <th>Логин</th>
                 <th>ФИО</th>
                 <th>Почта</th>
-                <th>Должность</th>
+                <th>Роль</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
             <tr>
-                <td>{{user[0]}}</td>
+                <td>{{ user[0] }}</td>
                 <td>
                     {% if is_specialist %}
                     <a href="{{ url_for('users.view_user', user_id=user[0]) }}">
@@ -27,13 +27,13 @@
                     {{ user[1] }}
                     {% endif %}
                 </td>
-                <td>{{ user[2] }}</td>
-                <td>{{ user[3] }}</td>
-                <td>{{ user[4] }}</td>
+                <td>{{ check_none(user[2]) }}</td>
+                <td>{{ check_none(user[3]) }}</td>
+                <td>{{ change_spec(user[4]) }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary">На главную</a>
+    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary mt-3 mb-4">На главную</a>
 </div>
 {% endblock %}

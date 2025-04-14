@@ -7,7 +7,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Название</th>
+                <th>Тип</th>
                 <th>Статус</th>
                 <th>Дата создания</th>
                 <th>Заявитель</th>
@@ -24,7 +24,11 @@
                 </td>
                 <td>{{ change_names(incident[2]) }}</td>
                 <td>{{ incident[3] }}</td>
-                <td>{{ get_username(None, incident[4]) }}</td>
+                <td>
+                    <a href="{{ url_for('users.view_user', user_id=incident[4]) }}">
+                        {{ get_fullname(None, incident[4]) }}
+                    </a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
