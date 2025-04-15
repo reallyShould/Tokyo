@@ -2,36 +2,36 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Пользователь #{{ user_id }}</h1>
+    <h1>Пользователь #{{ user.id }}</h1>
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Подробности</h5>
-            <form method="POST" action="{{ url_for('users.update_user', user_id=user_id) }}">
+            <form method="POST" action="{{ url_for('users.update_user', user_id=user.id) }}">
                 <div class="row mb-3">
                     <div class="col-3"><strong>Логин:</strong></div>
                     <div class="col-9">
-                        <input type="text" class="form-control" name="username" value="{{ username }}" required>
+                        <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-3"><strong>ФИО:</strong></div>
                     <div class="col-9">
-                        <input type="text" class="form-control" name="fullname" value="{{ fullname if fullname else '' }}" placeholder="Имя не добавлено">
+                        <input type="text" class="form-control" name="fullname" value="{{ user.fullname if user.fullname != 'Не указано' else '' }}" placeholder="Имя не добавлено">
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-3"><strong>Почта:</strong></div>
                     <div class="col-9">
-                        <input type="email" class="form-control" name="mail" value="{{ mail if mail else '' }}" placeholder="Почта не добавлена">
+                        <input type="email" class="form-control" name="mail" value="{{ user.mail if user.mail != 'Не указано' else '' }}" placeholder="Почта не добавлена">
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-3"><strong>Роль:</strong></div>
                     <div class="col-9">
                         <select class="form-select" id="role" name="role">
-                            <option value="admin" {{ 'selected' if role == 'admin' else '' }}>Администратор</option>
-                            <option value="system-adm" {{ 'selected' if role == 'system-adm' else '' }}>Системный администратор</option>
-                            <option value="user" {{ 'selected' if role == 'user' else '' }}>Пользователь</option>
+                            <option value="admin" {{ 'selected' if user.role == 'Администратор' else '' }}>Администратор</option>
+                            <option value="system-adm" {{ 'selected' if user.role == 'Специалист' else '' }}>Системный администратор</option>
+                            <option value="user" {{ 'selected' if user.role == 'Пользователь' else '' }}>Пользователь</option>
                         </select>
                     </div>
                 </div>

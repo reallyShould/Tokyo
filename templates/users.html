@@ -16,20 +16,19 @@
         <tbody>
             {% for user in users %}
             <tr>
-                <td>{{ user[0] }}</td>
+                <td>{{ user.id }}</td>
                 <td>
                     {% if is_specialist %}
-                    <a href="{{ url_for('users.view_user', user_id=user[0]) }}">
-                        {{ user[1] }}
+                    <a href="{{ url_for('users.view_user', user_id=user.id) }}">
+                        {{ user.username }}
                     </a>
-                    {% endif %}
-                    {% if not is_specialist %}
-                    {{ user[1] }}
+                    {% else %}
+                    {{ user.username }}
                     {% endif %}
                 </td>
-                <td>{{ check_none(user[2]) }}</td>
-                <td>{{ check_none(user[3]) }}</td>
-                <td>{{ change_spec(user[4]) }}</td>
+                <td>{{ user.fullname }}</td>
+                <td>{{ user.mail }}</td>
+                <td>{{ user.role }}</td>
             </tr>
             {% endfor %}
         </tbody>

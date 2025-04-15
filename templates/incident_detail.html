@@ -2,35 +2,35 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Детали инцидента #{{ incident[0] }}</h1>
+    <h1 class="mb-4">Детали инцидента #{{ incident.id }}</h1>
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title mb-3">{{ incident[1] }}</h5>
+            <h5 class="card-title mb-3">{{ incident.title }}</h5>
             <div class="row mb-2">
                 <div class="col-md-3 fw-bold">Описание:</div>
-                <div class="col-md-9">{{ incident[2] if incident[2] else "Описание отсутствует" }}</div>
+                <div class="col-md-9">{{ incident.description if incident.description else "Описание отсутствует" }}</div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-3 fw-bold">Статус:</div>
-                <div class="col-md-9">{{ status }}</div>
+                <div class="col-md-9">{{ incident.status }}</div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-3 fw-bold">Дата создания:</div>
-                <div class="col-md-9">{{ incident[4] }}</div>
+                <div class="col-md-9">{{ incident.created_at }}</div>
             </div>
             <div class="row mb-2">
                 <div class="col-md-3 fw-bold">Создал:</div>
                 <div class="col-md-9">{{ creator_username }}</div>
             </div>
-            {% if incident[6] %}
+            {% if incident.resolution %}
             <div class="row mb-2">
                 <div class="col-md-3 fw-bold">Решение:</div>
-                <div class="col-md-9">{{ incident[6] }}</div>
+                <div class="col-md-9">{{ incident.resolution }}</div>
             </div>
             {% endif %}
             <div class="mt-4">
-                {% if incident[3] != 'resolved' and is_specialist() %}
-                <a href="{{ url_for('incidents.resolve_incident', incident_id=incident[0]) }}" class="btn btn-success me-2">Решить</a>
+                {% if incident.status != 'Решён' and is_specialist %}
+                <a href="{{ url_for('incidents.resolve_incident', incident_id=incident.id) }}" class="btn btn-success me-2">Решить</a>
                 {% endif %}
                 <a href="javascript:history.back()" class="btn btn-secondary me-2">Назад</a>
             </div>

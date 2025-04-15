@@ -1,22 +1,33 @@
-def change_names(status: str) -> str:
+def change_names(incidents: list) -> list:
     status_mapping = {
         "open": "В очереди",
         "closed": "Закрыт",
         "resolved": "Решён"
     }
-    return status_mapping[status]
+    
+    for incident in incidents:
+        current_status = incident["status"]
+        incident["status"] = status_mapping.get(current_status, current_status)
+    
+    return incidents
 
-def change_spec(name: str) -> str:
+def change_spec(users: list) -> list:
     name_mapping = {
-        "user":"Пользователь",
-        "admin":"Администратор",
-        "system-adm":"Специалист",
-        None:"Не назначено"
+        "user": "Пользователь",
+        "admin": "Администратор",
+        "system-adm": "Специалист",
+        None: "Не назначено"
     }
-    return name_mapping[name]
+    
+    for user in users:
+        current_role = user["role"]
+        user["role"] = name_mapping.get(current_role, current_role)
+    
+    return users
 
-def check_none(text: str) -> str:
-    if text == None:
-        return "Не указано"
-    else:
-        return text
+def check_none(users: list) -> list:
+    for user in users:
+        user["fullname"] = "Не указано" if user["fullname"] is None else user["fullname"]
+        user["mail"] = "Не указано" if user["mail"] is None else user["mail"]
+    
+    return users

@@ -17,17 +17,21 @@
         <tbody>
             {% for request in requests %}
             <tr>
-                <td>{{ request[0] }}</td>
+                <td>{{ request.id }}</td>
                 <td>
-                    <a href="{{ url_for('incidents.view_incident', incident_id=request[0]) }}">
-                        {{ request[1] }}
+                    {% if current_user.is_specialist or request.user_id == current_user.id %}
+                    <a href="{{ url_for('incidents.view_incident', incident_id=request.id) }}">
+                        {{ request.title }}
                     </a>
+                    {% else %}
+                    {{ request.title }}
+                    {% endif %}
                 </td>
-                <td>{{ change_names(request[2]) }}</td>
-                <td>{{ request[3] }}</td>
+                <td>{{ request.status }}</td>
+                <td>{{ request.created_at }}</td>
                 <td>
-                    {% if request[2] != "resolved" %}
-                    <form action="{{ url_for('requests.close_request', request_id=request[0]) }}" method="POST" style="display:inline;">
+                    {% if request.status != "Решён" %}
+                    <form action="{{ url_for('requests.close_request', request_id=request.id) }}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm">Закрыть</button>
                     </form>
                     {% endif %}

@@ -27,6 +27,7 @@ class Users:
                 username TEXT UNIQUE NOT NULL,
                 fullname TEXT,
                 mail TEXT,
+                spec TEXT,
                 password_hash BLOB NOT NULL,
                 role TEXT NOT NULL DEFAULT 'user'
             )
@@ -39,7 +40,7 @@ class Users:
                 title TEXT NOT NULL,
                 description TEXT,
                 status TEXT DEFAULT 'open',
-                resolution TEXT,  -- Поле для описания решения
+                resolution TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id)
             )
@@ -120,23 +121,3 @@ class Users:
         if result:
             return User(result[0], result[1], result[2], result[3])
         return None
-
-    def get_username_by_id(self, user_id):
-        conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
-        cursor = conn.cursor()
-        cursor.execute("SELECT username FROM users WHERE id = ?", (user_id,))
-        result = cursor.fetchone()
-        conn.close()
-        if result:
-            return result[0]
-        return "Неизвестный пользователь"
-
-    def get_fullname_by_id(self, user_id):
-        conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
-        cursor = conn.cursor()
-        cursor.execute("SELECT fullname FROM users WHERE id = ?", (user_id,))
-        result = cursor.fetchone()
-        conn.close()
-        if result:
-            return result[0]
-        return "Имя не указано"

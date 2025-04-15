@@ -14,7 +14,6 @@ def main_page():
     else:
         return redirect(url_for('auth_routes.login'))
 
-
 @auth_routes.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -50,7 +49,6 @@ def login():
         user = users.login_user(username, password)
         if user:
             login_user(user)
-            flash('Вход выполнен успешно!', 'success')
             return redirect(url_for('auth_routes.dashboard'))
         else:
             flash('Неверное имя пользователя или пароль.', 'error')
@@ -71,11 +69,13 @@ def dashboard():
     
     incidents_count = 0
     if current_user.is_specialist():
-        cursor.execute("SELECT COUNT(*) FROM requests WHERE status == 'open'")
+        cursor.execute("SELECT COUNT(*) FROM requests WHERE status != 'resolved' AND status != 'closed'")
         incidents_count = cursor.fetchone()[0]
     
     cursor.execute("SELECT fullname FROM users WHERE username = ?", (current_user.username,))
-    fullname = cursor.fetchall()[0][0]
+    result = cursor.fetchone()
+    fullname = result[0] if result and result[0] else current_user.username
+    
     conn.close()
     
     return render_template('dashboard.html', 
@@ -86,9 +86,36 @@ def dashboard():
                          fullname=fullname,
                          is_specialist=current_user.is_specialist())
 
+@auth_routes.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        
+        user = users.login_user(current_user.username, current_password)
+        if not user:
+            flash('Неверный текущий пароль.', 'error')
+            return redirect(url_for('auth_routes.settings'))
+        
+        try:
+            password_hash = users.hash_password(new_password)
+            conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+            cursor = conn.cursor()
+            cursor.execute("UPDATE users SET password_hash = ? WHERE id = ?", (password_hash, current_user.id))
+            conn.commit()
+            conn.close()
+            flash('Пароль успешно изменён.', 'success')
+        except Exception as e:
+            flash('Ошибка при изменении пароля.', 'error')
+            print(f"Change password error: {e}")
+        
+        return redirect(url_for('auth_routes.settings'))
+    
+    return render_template('settings.html')
+
 @auth_routes.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('Вы успешно вышли из системы', 'success')
     return redirect(url_for('auth_routes.login'))

@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 import sqlite3
 import config
+from format_table import change_names
 
 requests_bp = Blueprint('requests', __name__)
 
@@ -9,10 +10,14 @@ requests_bp = Blueprint('requests', __name__)
 @login_required
 def list_requests():
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, status, created_at FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
-    requests = cursor.fetchall()
+    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
+    requests = [dict(row) for row in cursor.fetchall()]
     conn.close()
+    
+    requests = change_names(requests)
+    
     return render_template('requests.html', requests=requests)
 
 @requests_bp.route('/create_request', methods=['GET', 'POST'])
@@ -48,7 +53,6 @@ def close_request(request_id):
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     cursor = conn.cursor()
     
-    # Проверяем, что запрос принадлежит текущему пользователю
     cursor.execute("SELECT user_id FROM requests WHERE id = ?", (request_id,))
     request = cursor.fetchone()
     

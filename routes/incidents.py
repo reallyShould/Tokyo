@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 import sqlite3
 import config
 from format_table import change_names
-from models import Users
 
 incidents_bp = Blueprint('incidents', __name__)
 
@@ -14,18 +13,29 @@ def list_incidents():
         abort(403)
     
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE status != 'resolved' and status != 'closed'")
-    incidents = cursor.fetchall()
+    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE status != 'resolved' AND status != 'closed'")
+    incidents = [dict(row) for row in cursor.fetchall()]
+    
+    for incident in incidents:
+        cursor.execute("SELECT username, fullname FROM users WHERE id = ?", (incident["user_id"],))
+        user = cursor.fetchone()
+        incident["username"] = f"{user[1] if user[1] else user[0]}" if user else "Неизвестный пользователь"
+    
     conn.close()
     
-    return render_template('incidents.html', incidents=incidents, get_username=Users.get_username_by_id)
+    incidents = change_names(incidents)
+    
+    return render_template('incidents.html', incidents=incidents)
 
 @incidents_bp.route('/incidents/<int:incident_id>')
 @login_required
 def view_incident(incident_id):
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+    
     cursor.execute("SELECT id, title, description, status, created_at, user_id, resolution FROM requests WHERE id = ?", (incident_id,))
     incident = cursor.fetchone()
     
@@ -33,19 +43,23 @@ def view_incident(incident_id):
         conn.close()
         abort(404)
     
-    cursor.execute("SELECT username, fullname FROM users WHERE id = ?", (incident[5],))
+    if not (current_user.is_specialist() or incident["user_id"] == current_user.id):
+        conn.close()
+        abort(403)
+    
+    cursor.execute("SELECT username, fullname FROM users WHERE id = ?", (incident["user_id"],))
     user = cursor.fetchone()
-    creator_username = f"{user[1] if user[1] != None else user[0]} " if user else "Неизвестный пользователь"
-    cursor.execute("SELECT status FROM requests WHERE id = ?", (incident[0],))
-    status = change_names(cursor.fetchone()[0])
+    creator_username = f"{user[1] if user[1] else user[0]}" if user else "Неизвестный пользователь"
     
     conn.close()
+    
+    incident = dict(incident)
+    incident = change_names([incident])[0]
     
     return render_template('incident_detail.html', 
                          incident=incident,
                          creator_username=creator_username,
-                         status=status,
-                         is_specialist=current_user.is_specialist)
+                         is_specialist=current_user.is_specialist())
 
 @incidents_bp.route('/resolve_incident/<int:incident_id>', methods=['GET', 'POST'])
 @login_required

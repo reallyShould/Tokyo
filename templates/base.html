@@ -24,13 +24,15 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('auth_routes.dashboard') }}">Tokyo</a>
+            {% if current_user.is_authenticated %}
             <div class="navbar-nav">
                 <a class="nav-link" href="{{ url_for('incidents.list_incidents') }}">Инциденты</a>
                 <a class="nav-link" href="{{ url_for('requests.list_requests') }}">Обращения</a>
                 <a class="nav-link" href="{{ url_for('users.list_users') }}">Справочник</a>
-                <a class="nav-link" href="{{ url_for('auth_routes.logout') }}">Параметры (нет роута)</a>
+                <a class="nav-link" href="{{ url_for('auth_routes.settings') }}">Параметры</a>
                 <a class="nav-link" href="{{ url_for('auth_routes.logout') }}">Выйти</a>
             </div>
+            {% endif %}
         </div>
     </nav>
     
