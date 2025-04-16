@@ -9,16 +9,41 @@ requests_bp = Blueprint('requests', __name__)
 @requests_bp.route('/requests')
 @login_required
 def list_requests():
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 20))
+    except ValueError:
+        page = 1
+        per_page = 20
+    
+    page = max(1, page)
+    per_page = max(1, min(per_page, 50))
+    
+    offset = (page - 1) * per_page
+    
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
+    
+    cursor.execute("SELECT COUNT(*) FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
+    total_requests = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE user_id = ? AND status != 'closed' LIMIT ? OFFSET ?", 
+                   (current_user.id, per_page, offset))
     requests = [dict(row) for row in cursor.fetchall()]
+    
     conn.close()
     
     requests = change_names(requests)
     
-    return render_template('requests.html', requests=requests)
+    total_pages = (total_requests + per_page - 1) // per_page
+    
+    return render_template('requests.html', 
+                         requests=requests,
+                         page=page,
+                         per_page=per_page,
+                         total_pages=total_pages,
+                         total_requests=total_requests)
 
 @requests_bp.route('/create_request', methods=['GET', 'POST'])
 @login_required

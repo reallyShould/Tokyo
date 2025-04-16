@@ -9,19 +9,43 @@ users_bp = Blueprint('users', __name__)
 @users_bp.route("/users")
 @login_required
 def list_users():
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 20))
+    except ValueError:
+        page = 1
+        per_page = 20
+    
+    page = max(1, page)
+    per_page = max(1, min(per_page, 50))
+    
+    offset = (page - 1) * per_page
+    
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT id, username, fullname, mail, role FROM users")
+    
+    cursor.execute("SELECT COUNT(*) FROM users")
+    total_users = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT id, username, fullname, mail, role FROM users LIMIT ? OFFSET ?", 
+                   (per_page, offset))
     users = [dict(row) for row in cursor.fetchall()]
+    
     conn.close()
     
     users = check_none(users)
     users = change_spec(users)
     
+    total_pages = (total_users + per_page - 1) // per_page
+    
     return render_template('users.html',
-                           users=users,
-                           is_specialist=current_user.is_specialist())
+                         users=users,
+                         is_specialist=current_user.is_specialist(),
+                         page=page,
+                         per_page=per_page,
+                         total_pages=total_pages,
+                         total_users=total_users)
 
 @users_bp.route('/users/<int:user_id>')
 @login_required

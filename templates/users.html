@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-4">
     <h1>Справочник</h1>
-    <table class="table">
+    <table class="dark-table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -16,7 +16,7 @@
         <tbody>
             {% for user in users %}
             <tr>
-                <td>{{ user.id }}</td>
+                <td>USR-{{ '%06d' % user.id }}</td>
                 <td>
                     {% if is_specialist %}
                     <a href="{{ url_for('users.view_user', user_id=user.id) }}">
@@ -33,6 +33,22 @@
             {% endfor %}
         </tbody>
     </table>
+    <div class="pagination">
+        <div>
+            Записей на странице:
+            <select onchange="window.location.href='{{ url_for('users.list_users', page=1, per_page='') }}' + this.value">
+                <option value="10" {{ 'selected' if per_page == 10 else '' }}>10</option>
+                <option value="20" {{ 'selected' if per_page == 20 else '' }}>20</option>
+                <option value="50" {{ 'selected' if per_page == 50 else '' }}>50</option>
+            </select>
+        </div>
+        <div class="page-nav">
+            <span>{{ (page - 1) * per_page + 1 }}-{{ page * per_page if page * per_page <= total_users else total_users }} из {{ total_users }}</span>
+            <button onclick="window.location.href='{{ url_for('users.list_users', page=page-1, per_page=per_page) }}'" {{ 'disabled' if page == 1 else '' }}><</button>
+            <button onclick="window.location.href='{{ url_for('users.list_users', page=page+1, per_page=per_page) }}'" {{ 'disabled' if page == total_pages else '' }}>></button>
+        </div>
+    </div>
+    
     <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary mt-3 mb-4">На главную</a>
 </div>
 {% endblock %}

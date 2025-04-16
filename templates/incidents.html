@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-4">
     <h1>Список инцидентов</h1>
-    <table class="table">
+    <table class="dark-table">
         <thead>
             <tr>
                 <th>ID</th>
@@ -16,13 +16,16 @@
         <tbody>
             {% for incident in incidents %}
             <tr>
-                <td>{{ incident.id }}</td>
+                <td>INC-{{ '%06d' % incident.id }}</td>
                 <td>
                     <a href="{{ url_for('incidents.view_incident', incident_id=incident.id) }}">
                         {{ incident.title }}
                     </a>
                 </td>
-                <td>{{ incident.status }}</td>
+                <td>
+                    <span class="status-icon {{ 'open' if incident.status == 'В очереди' else 'in-progress' if incident.status == 'Закрыт' else 'critical' }}"></span>
+                    {{ incident.status }}
+                </td>
                 <td>{{ incident.created_at }}</td>
                 <td>
                     <a href="{{ url_for('users.view_user', user_id=incident.user_id) }}">
@@ -33,6 +36,23 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary">На главную</a>
+    
+    <div class="pagination">
+        <div>
+            Записей на странице:
+            <select onchange="window.location.href='{{ url_for('incidents.list_incidents', page=1, per_page='') }}' + this.value">
+                <option value="10" {{ 'selected' if per_page == 10 else '' }}>10</option>
+                <option value="20" {{ 'selected' if per_page == 20 else '' }}>20</option>
+                <option value="50" {{ 'selected' if per_page == 50 else '' }}>50</option>
+            </select>
+        </div>
+        <div class="page-nav">
+            <span>{{ (page - 1) * per_page + 1 }}-{{ page * per_page if page * per_page <= total_incidents else total_incidents }} из {{ total_incidents }}</span>
+            <button onclick="window.location.href='{{ url_for('incidents.list_incidents', page=page-1, per_page=per_page) }}'" {{ 'disabled' if page == 1 else '' }}><</button>
+            <button onclick="window.location.href='{{ url_for('incidents.list_incidents', page=page+1, per_page=per_page) }}'" {{ 'disabled' if page == total_pages else '' }}>></button>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary mt-3">На главную</a>
 </div>
 {% endblock %}

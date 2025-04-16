@@ -55,36 +55,30 @@ def login():
     
     return render_template('login.html')
 
+@auth_routes.route('/')
 @auth_routes.route('/dashboard')
 @login_required
 def dashboard():
     conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
-    cursor.execute("SELECT COUNT(*) FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
-    requests_count = cursor.fetchone()[0]
-
+    cursor.execute("SELECT COUNT(*) FROM requests WHERE user_id = ?", (current_user.id,))
+    user_requests = cursor.fetchone()[0]
+    
     cursor.execute("SELECT COUNT(*) FROM users")
-    users_count = cursor.fetchone()[0]
+    total_users = cursor.fetchone()[0]
     
-    incidents_count = 0
-    if current_user.is_specialist():
-        cursor.execute("SELECT COUNT(*) FROM requests WHERE status != 'resolved' AND status != 'closed'")
-        incidents_count = cursor.fetchone()[0]
-    
-    cursor.execute("SELECT fullname FROM users WHERE username = ?", (current_user.username,))
-    result = cursor.fetchone()
-    fullname = result[0] if result and result[0] else current_user.username
+    cursor.execute("SELECT COUNT(*) FROM requests WHERE status != 'resolved' AND status != 'closed'")
+    total_incidents = cursor.fetchone()[0]
     
     conn.close()
     
-    return render_template('dashboard.html', 
-                         users_count=users_count,
-                         requests_count=requests_count,
-                         incidents_count=incidents_count,
-                         username=current_user.username,
-                         fullname=fullname,
-                         is_specialist=current_user.is_specialist())
+    return render_template('dashboard.html',
+                         total_requests=user_requests,
+                         user_requests=user_requests,
+                         total_users=total_users,
+                         total_incidents=total_incidents)
 
 @auth_routes.route('/settings', methods=['GET', 'POST'])
 @login_required

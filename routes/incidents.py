@@ -6,29 +6,6 @@ from format_table import change_names
 
 incidents_bp = Blueprint('incidents', __name__)
 
-@incidents_bp.route('/incidents')
-@login_required
-def list_incidents():
-    if not current_user.is_specialist():
-        abort(403)
-    
-    conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE status != 'resolved' AND status != 'closed'")
-    incidents = [dict(row) for row in cursor.fetchall()]
-    
-    for incident in incidents:
-        cursor.execute("SELECT username, fullname FROM users WHERE id = ?", (incident["user_id"],))
-        user = cursor.fetchone()
-        incident["username"] = f"{user[1] if user[1] else user[0]}" if user else "Неизвестный пользователь"
-    
-    conn.close()
-    
-    incidents = change_names(incidents)
-    
-    return render_template('incidents.html', incidents=incidents)
-
 @incidents_bp.route('/incidents/<int:incident_id>')
 @login_required
 def view_incident(incident_id):
@@ -60,6 +37,53 @@ def view_incident(incident_id):
                          incident=incident,
                          creator_username=creator_username,
                          is_specialist=current_user.is_specialist())
+
+@incidents_bp.route('/incidents')
+@login_required
+def list_incidents():
+    if not current_user.is_specialist():
+        abort(403)
+    
+    try:
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 20))
+    except ValueError:
+        page = 1
+        per_page = 20
+    
+    page = max(1, page)
+    per_page = max(1, min(per_page, 50))
+    
+    offset = (page - 1) * per_page
+    
+    conn = sqlite3.connect(config.Config.SQLALCHEMY_DATABASE_URI)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT COUNT(*) FROM requests WHERE status != 'resolved' AND status != 'closed'")
+    total_incidents = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE status != 'resolved' AND status != 'closed' LIMIT ? OFFSET ?", 
+                   (per_page, offset))
+    incidents = [dict(row) for row in cursor.fetchall()]
+    
+    for incident in incidents:
+        cursor.execute("SELECT username, fullname FROM users WHERE id = ?", (incident["user_id"],))
+        user = cursor.fetchone()
+        incident["username"] = f"{user[1] if user[1] else user[0]}" if user else "Неизвестный пользователь"
+    
+    conn.close()
+    
+    incidents = change_names(incidents)
+    
+    total_pages = (total_incidents + per_page - 1) // per_page
+    
+    return render_template('incidents.html', 
+                         incidents=incidents,
+                         page=page,
+                         per_page=per_page,
+                         total_pages=total_pages,
+                         total_incidents=total_incidents)
 
 @incidents_bp.route('/resolve_incident/<int:incident_id>', methods=['GET', 'POST'])
 @login_required
