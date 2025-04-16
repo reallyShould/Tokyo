@@ -30,6 +30,10 @@ main {
     min-height: 0;
 }
 
+a {
+    color: #00b1c9; 
+}
+
 .footer {
     flex-shrink: 0;
     background-color: #151B1C;
