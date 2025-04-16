@@ -28,12 +28,12 @@
                     {% endif %}
                 </td>
                 <td>
-                    <span class="status-icon {{ 'open' if request.status == 'В очереди' else 'in-progress' if request.status == 'Закрыт' else 'critical' }}"></span>
+                    <span class="status-icon {{ 'passive' if request.status == 'В очереди' else 'critical' if request.status == 'Закрыт' else 'resolved' if request.status == 'Решён' else 'critical' }}"></span>
                     {{ request.status }}
                 </td>
                 <td>{{ request.created_at }}</td>
                 <td>
-                    {% if request.status != "Решён" %}
+                    {% if request.status != "Решён" and request.status != "Закрыт" %}
                     <form action="{{ url_for('requests.close_request', request_id=request.id) }}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger btn-sm">Закрыть</button>
                     </form>
@@ -60,6 +60,6 @@
         </div>
     </div>
     
-    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary mt-3">На главную</a>
+    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary mt-3 mb-4">На главную</a>
 </div>
 {% endblock %}

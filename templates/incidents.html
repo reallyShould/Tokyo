@@ -23,7 +23,7 @@
                     </a>
                 </td>
                 <td>
-                    <span class="status-icon {{ 'open' if incident.status == 'В очереди' else 'in-progress' if incident.status == 'Закрыт' else 'critical' }}"></span>
+                    <span class="status-icon {{ 'passive' if incident.status == 'В очереди' else 'in-progress' if incident.status == 'Закрыт' else 'resolved' if incident.status == 'Решён' else 'critical' }}"></span>
                     {{ incident.status }}
                 </td>
                 <td>{{ incident.created_at }}</td>
@@ -53,6 +53,6 @@
         </div>
     </div>
     
-    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary mt-3">На главную</a>
+    <a href="{{ url_for('auth_routes.dashboard') }}" class="btn btn-secondary mt-3 mb-4">На главную</a>
 </div>
 {% endblock %}

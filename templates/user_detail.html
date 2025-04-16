@@ -3,9 +3,9 @@
 {% block content %}
 <div class="container mt-4">
     <h1>Пользователь #{{ user.id }}</h1>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Подробности</h5>
+    <div class="card-2">
+        <div class="card-body-2">
+            <h5 class="card-title-2">Подробности</h5>
             <form method="POST" action="{{ url_for('users.update_user', user_id=user.id) }}">
                 <div class="row mb-3">
                     <div class="col-3"><strong>Логин:</strong></div>

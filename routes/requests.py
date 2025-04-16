@@ -28,7 +28,7 @@ def list_requests():
     cursor.execute("SELECT COUNT(*) FROM requests WHERE user_id = ? AND status != 'closed'", (current_user.id,))
     total_requests = cursor.fetchone()[0]
     
-    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE user_id = ? AND status != 'closed' LIMIT ? OFFSET ?", 
+    cursor.execute("SELECT id, title, status, created_at, user_id FROM requests WHERE user_id = ? LIMIT ? OFFSET ?", 
                    (current_user.id, per_page, offset))
     requests = [dict(row) for row in cursor.fetchall()]
     
